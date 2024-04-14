@@ -17,7 +17,7 @@ dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Installing decK
 # https://github.com/hbagdi/deck
-curl -sL https://github.com/hbagdi/deck/releases/download/v${DECK_VERSION}/deck_${DECK_VERSION}_linux_amd64.tar.gz \
+curl -sL https://github.com/Kong/deck/releases/download/v${DECK_VERSION}/deck_${DECK_VERSION}_linux_amd64.tar.gz \
     -o deck.tar.gz
 tar zxf deck.tar.gz deck
 sudo mv deck /usr/local/bin
@@ -27,7 +27,6 @@ sudo chmod 755 /usr/local/bin/deck
 # Install Kong
 echo "Installing Kong"
 EE_LICENSE=$(aws_get_parameter ee/license)
-EE_CREDS=$(aws_get_parameter ee/bintray-auth)
 if [ "$EE_LICENSE" != "placeholder" ]; then
     curl -Lo ${EE_PKG}.deb "https://packages.konghq.com/public/gateway-36/deb/ubuntu/pool/jammy/main/k/ko/${EE_PKG}/${EE_PKG}_$(dpkg --print-architecture).deb"
     if [ ! -f ${EE_PKG} ]; then
@@ -77,6 +76,8 @@ fi
 unset PGPASSWORD
 
 # Setup Configuration file
+mkdir -p /etc/kong
+
 cat <<EOF > /etc/kong/kong.conf
 # kong.conf, Kong configuration file
 # Written by Dennis Kelly <dennisk@zillowgroup.com>
@@ -135,7 +136,7 @@ EOF
     done
 else
     # CE does not create the kong directory
-    mkdir /usr/local/kong
+    mkdir -p /usr/local/kong
 fi
 
 chown root:kong /usr/local/kong
@@ -186,6 +187,11 @@ cat <<'EOF' > /etc/logrotate.d/kong
   endscript
 }
 EOF
+
+# Additional environment variables
+# cat <<EOF >> /etc/environment
+# DECK_REDIS_HOST=$(aws_get_parameter redis/primary-endpoint)
+# EOF
 
 # Start Kong under supervision
 echo "Starting Kong under supervision"

@@ -1,5 +1,11 @@
 # Kong Cluster Terraform Module for AWS
 
+:warning: This terraform module serves as reference point for getting started.
+While it may work for certain scenarios, it is NOT intended to work with
+all setups. Please fork the repo or copy over code from here
+(liberal Apache-licensed).
+
+
 [Kong API Gateway](https://konghq.com/) is an API gateway microservices
 management layer. Both Kong and Enterprise Edition are supported.
 
@@ -12,7 +18,7 @@ By default, the following resources will be provisioned:
 - An internal load balancer (HTTP and HTTPS)
   - HTTP:80 - Kong Proxy
   - HTTPS:443 - Kong Proxy
-  - HTTPS:8444 - Kong Admin API
+  - HTTPS:8444 - Kong Admin API (Enterprise Edition only)
   - HTTPS:8445 - Kong Manager (Enterprise Edition only)
   - HTTPS:8446 - Kong Dev Portal GUI (Enterprise Edition only)
   - HTTPS:8447 - Kong Dev Portal API (Enterprise Edition only)
@@ -277,14 +283,14 @@ Prerequisites:
 <td>no</td>
 </tr>
 <tr>
-<td>default_security_group</td>
-<td>Name of the default VPC security group for EC2 access</td>
+<td>additional_security_groups</td>
+<td>IDs of the additional security groups attached to Kong EC2 instance</td>
 <td>
 
-`string`</td>
+`list(string)`</td>
 <td>
 
-`"default"`</td>
+`[]`</td>
 <td>no</td>
 </tr>
 <tr>
@@ -347,8 +353,8 @@ Prerequisites:
 `string`</td>
 <td>
 
-n/a</td>
-<td>yes</td>
+`""`</td>
+<td>no</td>
 </tr>
 <tr>
 <td>ec2_root_volume_size</td>
@@ -370,17 +376,6 @@ n/a</td>
 <td>
 
 `"gp2"`</td>
-<td>no</td>
-</tr>
-<tr>
-<td>ee_bintray_auth</td>
-<td>Bintray authentication for the Enterprise Edition download (Format: username:apikey)</td>
-<td>
-
-`string`</td>
-<td>
-
-`"placeholder"`</td>
 <td>no</td>
 </tr>
 <tr>
@@ -853,8 +848,8 @@ n/a</td>
 <td>no</td>
 </tr>
 <tr>
-<td>vpc</td>
-<td>VPC Name for the AWS account and region specified</td>
+<td>vpc_id</td>
+<td>VPC ID for the AWS account and region specified</td>
 <td>
 
 `string`</td>
@@ -865,7 +860,7 @@ n/a</td>
 </tr>
 <tr>
 <td>db_final_snapshot_identifier</td>
-<td>If specified a final snapshot will be made of the RDS instance. If left blank, the finalsnapshot will be skipped</td>
+<td>If specified a final snapshot will be made of the RDS/Aurora instance. If left blank, the finalsnapshot will be skipped</td>
 <td>
 
 `string`</td>
@@ -932,11 +927,6 @@ to the AWS console and navigate to:
 Update the license key by editing the parameter (default value is "placeholder"):
  
     /[service]/[environment]/ee/license
-
-Update the Bintray authentication paramater (default value is "placeholder",
-format is "username:apikey")" for downloads:
-
-    /[service]/[environment]/ee/bintray-auth
 
 Alternatively, if your terraform files and state are secure, you can pass them 
 as variables to the module for a completely hands-off installation.

@@ -32,7 +32,7 @@ resource "aws_lb" "external" {
 
   name     = format("%s-%s-external", var.service, var.environment)
   internal = false
-  subnets  = data.aws_subnet_ids.public.ids
+  subnets  = data.aws_subnets.public.ids
 
   security_groups = [aws_security_group.external-lb.id]
 
@@ -58,7 +58,7 @@ resource "aws_lb_listener" "external-https" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.external-cert.arn
+  certificate_arn = data.aws_acm_certificate.external-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.external[0].arn
@@ -212,7 +212,7 @@ resource "aws_lb" "internal" {
 
   name     = format("%s-%s-internal", var.service, var.environment)
   internal = true
-  subnets  = data.aws_subnet_ids.private.ids
+  subnets  = data.aws_subnets.private.ids
 
   security_groups = [aws_security_group.internal-lb.id]
 
@@ -251,7 +251,7 @@ resource "aws_lb_listener" "internal-https" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.internal-cert.arn
+  certificate_arn = data.aws_acm_certificate.internal-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.internal[0].arn
@@ -267,7 +267,7 @@ resource "aws_lb_listener" "admin" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.internal-cert.arn
+  certificate_arn = data.aws_acm_certificate.internal-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.admin[0].arn
@@ -283,7 +283,7 @@ resource "aws_lb_listener" "manager" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.internal-cert.arn
+  certificate_arn = data.aws_acm_certificate.internal-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.manager[0].arn
@@ -299,7 +299,7 @@ resource "aws_lb_listener" "portal-gui" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.internal-cert.arn
+  certificate_arn = data.aws_acm_certificate.internal-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.portal-gui[0].arn
@@ -315,7 +315,7 @@ resource "aws_lb_listener" "portal" {
   protocol          = "HTTPS"
 
   ssl_policy      = var.ssl_policy
-  certificate_arn = data.aws_acm_certificate.internal-cert.arn
+  certificate_arn = data.aws_acm_certificate.internal-cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.portal[0].arn

@@ -1,6 +1,6 @@
 # Network settings
-variable "vpc" {
-  description = "VPC Name for the AWS account and region specified"
+variable "vpc_id" {
+  description = "VPC ID for the AWS account and region specified"
   type        = string
 }
 
@@ -25,11 +25,11 @@ variable "public_subnets" {
   default = "public"
 }
 
-variable "default_security_group" {
-  description = "Name of the default VPC security group for EC2 access"
-  type        = string
+variable "additional_security_groups" {
+  description = "IDs of the additional security groups attached to Kong EC2 instance"
+  type        = list(string)
 
-  default = "default"
+  default = []
 }
 
 # Access control
@@ -146,13 +146,6 @@ variable "enable_ee" {
   default = false
 }
 
-variable "ee_bintray_auth" {
-  description = "Bintray authentication for the Enterprise Edition download (Format: username:apikey)"
-  type        = string
-
-  default = "placeholder"
-}
-
 variable "ee_license" {
   description = "Enterprise Edition license key (JSON format)"
   type        = string
@@ -168,12 +161,12 @@ variable "ec2_ami" {
   type        = map(string)
 
   default = {
-    us-east-1    = "ami-7029320f"
-    us-east-2    = "ami-0350efe0754b8e179"
-    us-west-1    = "ami-657f9006"
-    us-west-2    = "ami-59694f21"
-    eu-central-1 = "ami-19b2bcf2"
-    eu-west-1    = "ami-0395f5f72b8516ef9"
+    us-east-1    = "ami-097f2dec72be3d174"
+    us-east-2    = "ami-0ba142a7063a73767"
+    us-west-1    = "ami-07b69f5dcdbb4abaf"
+    us-west-2    = "ami-028b81a9f357b2b96"
+    eu-central-1 = "ami-0cbcfdbe2416ea8df"
+    eu-west-1    = "ami-0eb00845cbc30b475"
   }
 }
 
@@ -201,6 +194,8 @@ variable "ec2_root_volume_type" {
 variable "ec2_key_name" {
   description = "AWS SSH Key"
   type        = string
+
+  default = ""
 }
 
 variable "asg_max_size" {
@@ -237,14 +232,14 @@ variable "ee_pkg" {
   description = "Filename of the Enterprise Edition package"
   type        = string
 
-  default = "kong-enterprise-edition-1.3.0.1.bionic.all.deb "
+  default = "kong-enterprise-edition_2.8.1.4_all.deb"
 }
 
 variable "ce_pkg" {
   description = "Filename of the Community Edition package"
   type        = string
 
-  default = "kong-1.5.0.bionic.amd64.deb"
+  default = "kong_2.8.1_amd64.deb"
 }
 
 # Load Balancer settings
@@ -328,26 +323,31 @@ variable "idle_timeout" {
 variable "ssl_cert_external" {
   description = "SSL certificate domain name for the external Kong Proxy HTTPS listener"
   type        = string
+  default     = null
 }
 
 variable "ssl_cert_internal" {
   description = "SSL certificate domain name for the internal Kong Proxy HTTPS listener"
   type        = string
+  default     = null
 }
 
 variable "ssl_cert_admin" {
   description = "SSL certificate domain name for the Kong Admin API HTTPS listener"
   type        = string
+  default     = null
 }
 
 variable "ssl_cert_manager" {
   description = "SSL certificate domain name for the Kong Manager HTTPS listener"
   type        = string
+  default     = null
 }
 
 variable "ssl_cert_portal" {
   description = "SSL certificate domain name for the Dev Portal listener"
   type        = string
+  default     = null
 }
 
 variable "ssl_policy" {
@@ -391,7 +391,7 @@ variable "db_engine_version" {
   description = "Database engine version"
   type        = string
 
-  default = "11.4"
+  default = "11.14"
 }
 
 variable "db_engine_mode" {
@@ -512,11 +512,11 @@ variable "deck_version" {
   description = "Version of decK to install"
   type        = string
 
-  default = "1.0.0"
+  default = "1.14.0"
 }
 
 variable "db_final_snapshot_identifier" {
-  description = "The final snapshot name of the RDS instance when it gets destroyed"
+  description = "The final snapshot name of the RDS/Aurora instance when it gets destroyed"
   type        = string
   default     = ""
 }

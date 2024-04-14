@@ -5,15 +5,15 @@ resource "aws_launch_configuration" "kong" {
   iam_instance_profile = aws_iam_instance_profile.kong.name
   key_name             = var.ec2_key_name
 
-  security_groups = [
-    data.aws_security_group.default.id,
-    aws_security_group.kong.id,
-  ]
+  security_groups = setunion(
+    [aws_security_group.kong.id],
+    var.additional_security_groups,
+  )
 
   associate_public_ip_address = false
   enable_monitoring           = true
   placement_tenancy           = "default"
-  user_data                   = data.template_cloudinit_config.cloud-init.rendered
+  user_data                   = data.cloudinit_config.cloud-init.rendered
 
   root_block_device {
     volume_size = var.ec2_root_volume_size
@@ -27,7 +27,7 @@ resource "aws_launch_configuration" "kong" {
 
 resource "aws_autoscaling_group" "kong" {
   name                = format("%s-%s", var.service, var.environment)
-  vpc_zone_identifier = data.aws_subnet_ids.private.ids
+  vpc_zone_identifier = data.aws_subnets.private.ids
 
   launch_configuration = aws_launch_configuration.kong.name
 
@@ -82,6 +82,7 @@ resource "aws_autoscaling_group" "kong" {
 
   depends_on = [
     aws_db_instance.kong,
-    aws_rds_cluster.kong
+    aws_rds_cluster.kong,
+    aws_elasticache_replication_group.kong
   ]
 }
