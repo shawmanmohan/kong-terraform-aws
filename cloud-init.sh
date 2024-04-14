@@ -28,9 +28,7 @@ sudo chmod 755 /usr/local/bin/deck
 echo "Installing Kong"
 EE_LICENSE=$(aws_get_parameter ee/license)
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    curl -sL "https://download.konghq.com/gateway-2.x-ubuntu-bionic/pool/all/k/kong-enterprise-edition/${EE_PKG}" \
-        -o ${EE_PKG} 
-
+    curl -Lo ${EE_PKG}.deb "https://packages.konghq.com/public/gateway-36/deb/ubuntu/pool/jammy/main/k/ko/${EE_PKG}/${EE_PKG}_$(dpkg --print-architecture).deb"
     if [ ! -f ${EE_PKG} ]; then
         echo "Error: Enterprise edition download failed, aborting."
         exit 1
@@ -43,9 +41,8 @@ EOF
     chown root:kong /etc/kong/license.json
     chmod 640 /etc/kong/license.json
 else  
-    curl -sL "https://download.konghq.com/gateway-2.x-ubuntu-bionic/pool/all/k/kong/${CE_PKG}" \
-        -o ${CE_PKG}
-    dpkg -i ${CE_PKG}
+    curl -Lo ${CE_PKG}.deb "https://packages.konghq.com/public/gateway-36/deb/debian/pool/bullseye/main/k/ko/${CE_PKG}/${CE_PKG}_$(dpkg --print-architecture).deb"
+    dpkg -i ${CE_PKG}.deb
 fi
 
 # Setup database
